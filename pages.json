@@ -1,25 +1,40 @@
 {
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
 		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": "用户登录"
+			}
+		},
+		{
+			"path": "pages/current_conference/current_conference",
+			"style": {
+				"navigationBarTitleText": "当前"
+			}
+		},
+		{
 			"path": "pages/home_page/home_page",
 			"style": {
 				"navigationBarTitleText": "首页"
 			}
 		}, {
-			"path": "pages/user_center/user_center",
+				"path": "pages/user_center/user_center",
 			"style": {
 				"navigationBarTitleText": "用户"
 			}
-		}, {
-			"path": "pages/current_conference/current_conference",
-			"style": {
-				"navigationBarTitleText": "当前"
-			}
-		}, {
-			"path": "pages/login/login",
-			"style": {}
 		}
-	],
+	    ,{
+            "path" : "pages/create_meeting/create_meeting",
+            "style" : {
+				"navigationBarTitleText": "创建会议"
+			}
+        }
+        
+        ,{
+            "path" : "pages/my_meeting/my_meeting",
+            "style" : {}
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "移动会议",
@@ -45,7 +60,7 @@
 			{
 				"pagePath": "pages/user_center/user_center",
 				"text": "我的",
-				"isconPath": "static/denglu.png",
+				"iconPath": "static/denglu.png",
 				"selectedIconPath": "static/denglu.png"
 			}
 

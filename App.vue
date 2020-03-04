@@ -16,6 +16,13 @@
 	}
 </script>
 
-<style>
+<style lang="less">
 	/*每个页面公共css */
+.flex-r{
+	display: flex;
+}
+.flex-c{
+	display: flex;
+	flex-direction: column;
+}
 </style>
