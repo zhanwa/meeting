@@ -17,7 +17,7 @@
 			<text>即将开始的会议</text>
 		</view>
 		<view class="my-meeting">
-			<text>我创建的会议</text>
+			<navigator url="../my_meeting/my_meeting">我创建的会议</navigator>
 		</view>
 		<view class="appen-meeting">
 			<text>我参加的会议</text>

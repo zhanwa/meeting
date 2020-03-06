@@ -101,7 +101,7 @@
 					date:date,
 					label:this.label[this.index]
 				}).then(res => {
-					console.log(res);
+					console.log(typeof res.data);
 				}).catch(err => {
 					console.log(err);
 				})

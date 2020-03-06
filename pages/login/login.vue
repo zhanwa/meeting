@@ -26,7 +26,7 @@
 				//userInfo {"nickName":"深海","gender":1,...avatarUrl":"https://7tdPvkPaJlkaLFFbLAffGVApluZdanLkDVplNlAhq1EJA/132"}
 				// 与服务器交互将数据提交到服务端数据库
 				uni.request({
-					url: 'http://127.0.0.1:8000/userapi/v1/login/',
+					url: _self.baseurl+'userapi/v1/login/',
 					method: 'POST',
 					header: {
 						'content-type': "application/json"
@@ -76,7 +76,7 @@
 			uni.login({
 				success(res) {
 					uni.request({
-						url: 'http://127.0.0.1:8000/userapi/v1/login/',
+						url: _self.baseurl+'userapi/v1/login/',
 						method: 'GET',
 						data: {
 							code: res.code

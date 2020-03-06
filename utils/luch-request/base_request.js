@@ -2,11 +2,11 @@ import Request from './request'
 import {getNewTokenServe} from '../api.js'
 const http = new Request()
 http.setConfig((config) => { /* 设置全局配置 */
-	config.baseUrl = 'http://127.0.0.1:8000/' /* 根域名不同 */
+	// config.baseUrl = 'http://127.0.0.1:8000/' /* 根域名不同 */
+	config.baseUrl = 'http://192.168.2.104:8000/'
 	config.header = {
 		...config.header
 	}
-	config.dataType = 'text'
 	return config
 })
 

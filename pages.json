@@ -34,6 +34,10 @@
             "path" : "pages/my_meeting/my_meeting",
             "style" : {}
         }
+        ,{
+            "path" : "pages/meeting_detail/meeting_detail",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
