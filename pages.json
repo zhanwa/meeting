@@ -38,6 +38,22 @@
             "path" : "pages/meeting_detail/meeting_detail",
             "style" : {}
         }
+        ,{
+            "path" : "pages/append/append",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/chat/chat",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/lottery/lottery",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/sign_in/sign_in",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

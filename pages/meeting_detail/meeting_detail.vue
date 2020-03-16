@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<view class="title">
-			测试
+			{{m_obj.m_title}}
 		</view>
 		<uni-segmented-control :current="current" :values="items" @clickItem="onClickItem" style-type="text" active-color="#4cd964"></uni-segmented-control>
 		<view class="content">
@@ -26,7 +26,8 @@
 					<label>会议秘钥:</label>
 					<input type="text" placeholder="会议秘钥" v-model="s_value" />
 				</view>
-				<button type="primary" @click="apply()">申请加入</button>
+				<button type="primary" @click="apply()" v-if="m_obj.mcreator_id == u_id">管理会议</button>
+				<button type="primary" @click="apply()" :disabled="sign" v-else>加入会议</button>
 			</view>
 			<view v-show="current === 1">
 				选项卡2的内容
@@ -43,11 +44,14 @@
 		},
 		data() {
 			return {
+				// 报名成功标志
+				sign: false,
 				items: ['详情', '报名人员'],
 				current: 0,
 				// 会议信息
-				m_obj : {},
-				m_id:''
+				m_obj: {},
+				m_id: '',
+				u_id: uni.getStorageSync('SUID')
 			};
 		},
 		methods: {
@@ -56,18 +60,26 @@
 					this.current = event.currentIndex;
 				}
 			},
-			apply(){
+			// 加入会议
+			apply() {
 				let u_id = uni.getStorageSync('SUID')
-				this.$http.post('meetingapi/v1/getmeeting/',{u_id:u_id,m_id:this.m_id}).then(res=>{
-					console.log(res);
-				}).catch(err=>{
+				this.$http.post('meetingapi/v1/getmeeting/', {
+					u_id: u_id,
+					m_id: this.m_id
+				}).then(res => {
+					console.log(res.data);
+					if (res.data.msg == 200) {
+						this.sign = true
+					}
+				}).catch(err => {
 					console.log(err);
 				})
 			}
 		},
 		onLoad(option) {
 			console.log(option);
-			this.m_id=option.m_id
+			this.m_id = option.m_id
+			// 获得会议详情
 			this.$http.get('meetingapi/v1/getmeeting/', {
 				params: {
 					m_id: option.m_id

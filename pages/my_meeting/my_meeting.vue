@@ -9,7 +9,8 @@
 				<uni-tag :text=item.mlabel> </uni-tag>
 				<template v-slot:footer>
 					<view class="footer-box flex-r">
-						<view>开始</view>
+						<view v-if="type == 'create'">开始</view>
+						<view v-if="type == 'append'">进入</view>
 						<view>分享</view>
 						<view style="background-color: red;" @click="delete_meeting(item.m_id)">删除</view>
 					</view>
@@ -31,6 +32,7 @@
 		},
 		data() {
 			return {
+				type:'',
 				// 会议状态
 				extra: '',
 				// 会议数据
@@ -54,17 +56,33 @@
 				});
 			}
 		},
-		onLoad() {
+		onLoad(option) {
+			this.type = option.type
 			let u_id = uni.getStorageSync("SUID")
-			this.$http.get('meetingapi/v1/setmeeting/', {
-				params: {
-					u_id: u_id
-				}
-			}).then(res => {
-				this.m_list = res.data.data.reverse()
-			}).catch(err => {
-				console.log(err);
-			})
+			if (this.type == 'create') {
+				this.$http.get('meetingapi/v1/setmeeting/', {
+					params: {
+						opt : "create",
+						u_id: u_id
+					}
+				}).then(res => {
+					this.m_list = res.data.data.reverse()
+				}).catch(err => {
+					console.log(err);
+				})
+			}
+			else if(this.type == 'append'){
+				this.$http.get('meetingapi/v1/setmeeting/', {
+					params: {
+						opt : "append",
+						u_id: u_id
+					}
+				}).then(res => {
+					this.m_list = res.data.data.reverse()
+				}).catch(err => {
+					console.log(err);
+				})
+			}
 		}
 	}
 </script>

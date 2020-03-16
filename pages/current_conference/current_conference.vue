@@ -11,7 +11,8 @@
 						<uni-tag :text=item.mlabel> </uni-tag>
 						<template v-slot:footer>
 							<view class="footer-box flex-r">
-								<view>加入</view>
+								<view v-if="item.mcreator_id == u_id" @click="nato(item.m_id)">开始</view>
+								<view v-if="item.mcreator_id !== u_id" @click="nato(item.m_id)">加入</view>
 								<view>分享</view>
 								<view style="background-color: red;" @click="detail_meeting(item.m_id)">详情</view>
 							</view>
@@ -45,7 +46,8 @@
 			return {
 				items: ['全部会议', '已完成', '未完成'],
 				current: 0,
-				m_list: []
+				m_list: [],
+				u_id : uni.getStorageSync("SUID")
 			}
 		},
 		methods: {
@@ -59,13 +61,18 @@
 				uni.navigateTo({
 				    url: `../meeting_detail/meeting_detail?m_id=${m_id}`
 				});
+			},
+			nato(m_id) {
+				uni.navigateTo({
+				    url: `../append/append?m_id=${m_id}`
+				});
 			}
 		},
 		onLoad() {
-			let u_id = uni.getStorageSync("SUID")
+			
 			this.$http.get('meetingapi/v1/setmeeting/', {
 				params: {
-					u_id: u_id
+					opt:"all"
 				}
 			}).then(res => {
 				this.m_list = res.data.data.reverse()
