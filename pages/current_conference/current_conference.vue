@@ -11,7 +11,7 @@
 						<uni-tag :text=item.mlabel> </uni-tag>
 						<template v-slot:footer>
 							<view class="footer-box flex-r">
-								<view v-if="item.mcreator_id == u_id" @click="nato(item.m_id)">开始</view>
+								<view v-if="item.mcreator_id == u_id" @click="nato(item.m_id,item.mcreator_id)">开始</view>
 								<view v-if="item.mcreator_id !== u_id" @click="nato(item.m_id)">加入</view>
 								<view>分享</view>
 								<view style="background-color: red;" @click="detail_meeting(item.m_id)">详情</view>
@@ -62,9 +62,15 @@
 				    url: `../meeting_detail/meeting_detail?m_id=${m_id}`
 				});
 			},
-			nato(m_id) {
+			nato(m_id,mcreator_id) {
+				let role = '';
+				if(mcreator_id == this.u_id){
+					role = 'manage'
+				}else{
+					role = 'append'
+				}
 				uni.navigateTo({
-				    url: `../append/append?m_id=${m_id}`
+				    url: `../append/append?m_id=${m_id}&role=${role}`
 				});
 			}
 		},

@@ -12,9 +12,13 @@ http.setConfig((config) => { /* 设置全局配置 */
 
 
 http.interceptor.request((config, cancel) => { /* 请求之前拦截器 */
-	config.header = {
-		'content-type': 'application/json',
-		token: getNewTokenServe()
+	// config.header = {
+	// 	// 'content-type': 'application/json',
+	// 	token: getNewTokenServe()
+	// }
+	config.header['token'] = getNewTokenServe()
+	if(config.method === 'UPLOAD'){
+		config.header['content-type']='multipart'
 	}
 
 	// if (!token) { // 如果token不存在，调用cancel 会取消本次请求，但是该函数的catch() 仍会执行

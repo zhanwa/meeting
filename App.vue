@@ -18,6 +18,8 @@
 
 <style lang="less">
 	/*每个页面公共css */
+	@import "colorui/main.css";
+	@import "colorui/icon.css";
 .flex-r{
 	display: flex;
 }

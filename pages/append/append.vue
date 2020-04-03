@@ -15,7 +15,7 @@
 				<text class="text">抽奖</text>
 			</uni-grid-item>
 			<uni-grid-item :index='5'>
-				<text class="text">待开发</text>
+				<text class="text">文件</text>
 			</uni-grid-item>
 			<uni-grid-item :index='6'>
 				<text class="text">待开发</text>
@@ -35,7 +35,9 @@
 		},
 		data() {
 			return {
-				m_id : ''
+				m_id : '',
+				// 用户角色
+				role:''
 			}
 		},
 		methods: {
@@ -52,16 +54,23 @@
 				} else if(e.detail.index==1){
 					uni.navigateTo({
 						url: '../sign_in/sign_in?m_id=' + this.m_id,
-						success: res => {},
-						fail: () => {},
-						complete: () => {}
+						
 					});
+				} else if(e.detail.index == 2){
+					uni.navigateTo({
+						url: '../vote_manage/vote_manage?m_id=' + this.m_id
+					})
+				}else if(e.detail.index == 5){
+					uni.navigateTo({
+						url: '../file/file?m_id=' + this.m_id+'&role='+this.role
+					})
 				}
 			}
 		},
 		onLoad(option) {
-			console.log(option.m_id);
-			this.m_id = option.m_id
+			console.log(option.m_id,option.role);
+			this.m_id = option.m_id;
+			this.role = option.role;
 		}
 	}
 </script>

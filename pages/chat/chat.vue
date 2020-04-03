@@ -1,17 +1,41 @@
 <template>
-	<view class="websockets">
-		<input type="text" placeholder="请输入" v-model="value" />
-		<button type="primary" @tap="clickRequest">点击发送请求</button>
-		<button type="primary" @tap="leave">离开页面</button>
-		<view class="view flex-r" v-for="(item,index) in sereve_rep" :key=index>
-			<image :src=item.face mode="" style="width: 70rpx; height: 70rpx;"></image>
-			<view class="name" v-show="item.face">
-				{{item.naem}}:
+	<view class="my_chat">
+		<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop"
+		 :scroll-into-view="scrollToView" >
+			<view class="cu-chat">
+				<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}">
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
+					<view class="main">
+						<view class="content bg-green shadow">
+							<text>{{item.msg}}</text>
+						</view>
+					</view>
+					<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
+				</view>
+				<!-- <view class="cu-item">
+				<view class="cu-avatar radius" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big143004.jpg);"></view>
+				<view class="main">
+					<view class="content shadow">
+						<text>喵喵喵！喵喵喵！</text>
+					</view>
+				</view>
+			</view> -->
 			</view>
-			<view class="content" v-show="item.naem">
-				{{item.msg}}
+		</scroll-view>
+
+		<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
+			<view class="action">
+				<text class="cuIcon-sound text-grey"></text>
 			</view>
+			<input class="solid-bottom" v-model="value" :adjust-position="false" :focus="false" maxlength="300" cursor-spacing="10"
+			 @focus="InputFocus" @blur="InputBlur"></input>
+			<view class="action">
+				<text class="cuIcon-emojifill text-grey"></text>
+			</view>
+			<button class="cu-btn bg-green shadow" @click="clickRequest">发送</button>
 		</view>
+
 	</view>
 </template>
 
@@ -26,28 +50,56 @@
 		},
 		data() {
 			return {
-				m_id:'',
-				u_id:uni.getStorageSync('SUID'),
+				scrollAnimation:false,
+				scrollTop:0,
+				scrollToView:'',
+				// 屏幕高度
+				screen_height: '',
+				// 限制发送频率
+				b_on: "1",
+				InputBottom: 0,
+				m_id: '',
+				u_id: uni.getStorageSync('SUID'),
 				face: uni.getStorageSync('SFACE'),
 				name: uni.getStorageSync('SNAME'),
 				value: '',
 				socketTask: null,
 				// 确保websocket是打开状态
 				is_open_socket: false,
-				sereve_rep : []
+				barrage: [],
+				// mybarrage:[]
 			}
 		},
 		// 关闭websocket【必须在实例销毁之前关闭,否则会是underfined错误】
 		beforeDestroy() {
 			this.closeSocket();
 		},
+
+		onReachBottom() {
+
+		},
 		methods: {
+			// 输入框聚焦
+			InputFocus(e) {
+				this.InputBottom = e.detail.height
+				// 获取屏幕高度
+				// uni.getSystemInfo({
+				// 	success(res) {
+				// 		console.log(res);
+				// 		_self.screen_height = res.windowHeight
+				// 	}
+				// })
+			},
+			// 输入框失去焦点
+			InputBlur(e) {
+				this.InputBottom = 0
+			},
 			// 进入这个页面的时候创建websocket连接【整个页面随时使用】
 			connectSocketInit() {
 				// 创建一个this.socketTask对象【发送、接收、关闭socket都由这个对象操作】
 				this.socketTask = uni.connectSocket({
 					// 【非常重要】必须确保你的服务器是成功的,如果是手机测试千万别使用ws://127.0.0.1:9099【特别容易犯的错误】
-					url: this.basewsurl + 'meetingapi/chat/'+this.m_id+'/'+this.u_id,
+					url: this.basewsurl + 'meetingapi/chat/wx/' + this.m_id + '/' + this.u_id,
 					success(data) {
 						console.log("websocket连接成功");
 					},
@@ -67,8 +119,22 @@
 					// 注：只有连接正常打开中 ，才能正常收到消息
 					this.socketTask.onMessage((res) => {
 						console.log("收到服务器内容：" + res.data);
-						this.sereve_rep = this.sereve_rep.concat(JSON.parse(res.data))
-						console.log(this.sereve_rep);
+						let msgdata = JSON.parse(res.data)
+						this.$nextTick(function() {
+							// 滚动到底
+							this.scrollToView = 'msg'+ msgdata.msg
+						});
+						this.barrage = this.barrage.concat(msgdata)
+						console.log(this.barrage);
+						
+						// let resp = JSON.parse(res.data)
+						// if(resp.type == 'me'){
+						// 	this.mybarrage=this.mybarrage.concat(resp)
+						// 	console.log('我发的'+this.mybarrage);
+						// }else if(resp.type == 'otherbarrage'){
+						// 	this.otherbarrage = this.otherbarrage.concat(resp)
+						// 	console.log('其他人发的'+this.otherbarrage);
+						// }
 					});
 				})
 				// 这里仅是事件监听【如果socket关闭了会执行】
@@ -90,31 +156,83 @@
 			},
 			clickRequest() {
 				console.log(this.value);
-				let send_data = {
-					msg: this.value,
-					face: this.face,
-					naem: this.name
-				};
-				if (this.is_open_socket) {
-					// websocket的服务器的原理是:发送一次消息,同时返回一组数据【否则服务器会进去死循环崩溃】			
-					// data只接受str和arrybuff(二进制数组),故传递时需要转为json字符串传输
-					this.socketTask.send({
-						data: JSON.stringify(send_data),
-						async success() {
-							_self.value = '',
-							console.log(_self.value);
-							console.log("消息发送成功");
-						},
+				if (this.value.trim()) {
+					if (this.b_on == "1") {
+						this.b_on = "0";
+						setTimeout(() => {
+							_self.b_on = "1";
+							console.log('我是定时器');
+						}, 3000)
+						let send_data = {
+							// 标志是否我发的
+							type: 'me',
+							msg: this.value,
+							face: this.face,
+							naem: this.name
+						};
+						this.value = '';
+						console.log('在发送前以清空');
+						if (this.is_open_socket) {
+							// websocket的服务器的原理是:发送一次消息,同时返回一组数据【否则服务器会进去死循环崩溃】			
+							// data只接受str和arrybuff(二进制数组),故传递时需要转为json字符串传输
+							this.socketTask.send({
+								data: JSON.stringify(send_data),
+								// async返回一个promise对象,单用他时且没用返回值时,该函数会立即执行,不会阻塞后面的函数
+								async success() {
+									_self.value = '';
+									console.log('发送后清空');
+									console.log(_self.value);
+									console.log("消息发送成功");
+								},
+							});
+						}
+
+					} else {
+						uni.showToast({
+							title: '发送太快了',
+							duration: 2000
+						});
+					}
+
+				} else {
+					this.value = '';
+					uni.showToast({
+						title: '输入不能为空',
+						duration: 2000
 					});
 				}
+
 			},
-			leave() {
-				uni.navigateBack()
-			}
+			// scrollToBottom() {
+			// 	let that = this;
+			// 	let query = uni.createSelectorQuery();
+			// 	query.select('.cu-chat').boundingClientRect();
+			// 	query.exec((res) => {
+			// 			console.log(res);
+			// 		})
+			// 	}
+
+		},
+		mounted() {
+			// 判断当前信息框的高度是否触底
+			this.scrollToBottom()
 		}
 	}
 </script>
 
-<style>
+<style lang="less" scoped>
+	page {
+		padding-bottom: 100upx;
+	}
 
+	.cu-chat {
+		position: relative;
+		margin-bottom: 110rpx;
+	}
+
+	.cu-chat .cu-item {
+		display: flex;
+		padding: 30upx 30upx 20upx;
+		position: relative;
+	}
 </style>

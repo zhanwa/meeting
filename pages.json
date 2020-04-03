@@ -54,6 +54,14 @@
             "path" : "pages/sign_in/sign_in",
             "style" : {}
         }
+        ,{
+            "path" : "pages/vote_manage/vote_manage",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/file/file",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

@@ -1,6 +1,6 @@
 <template>
 	<view class="sign_in">
-		<view class="sign">
+		<view class="sign" style="margin-bottom: 20px;">
 			签到方式
 		</view>
 		<view class="sign_style">
