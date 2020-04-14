@@ -15,11 +15,11 @@
 
 				<view :id='index' style='display:flex;' hover-class='choose_block' @click='btn_preview' @longpress='showActionSheet2'>
 					<view class='type_block'>
-						<image src='item.type_icon'></image>
+						<image src='item.Dstatus_icon'></image>
 					</view>
 					<view class='file_info'>
-						<view class='file_name'>{{item.name}} ({{item.type}})</view>
-						<view class='file_time'>{{item.time}}</view>
+						<view class='file_name'>{{item.Dname}} ({{item.Dstatus}})</view>
+						<view class='file_time'>{{item.Dtime}}</view>
 						<view class='file_download' :id='index' @click='btn_manage'>
 							<image v-if='item.download=="true"' src='can_download'></image>
 							<image v-if='item.download=="false"' src='cannot_download'></image>
@@ -53,11 +53,11 @@
 
 				<view style='display:flex;' :id='index' @click='btn_preview' @longpress='showActionSheet1'>
 					<view class='type_block'>
-						<image src='item.type_icon'></image>
+						<image src='item.Dstatus_icon'></image>
 					</view>
 					<view class='file_info'>
-						<view class='file_name'>{{item.name}} ({{item.type}})</view>
-						<view class='file_time'>{{item.time}}</view>
+						<view class='file_name'>{{item.Dname}} ({{item.Dstatus}})</view>
+						<view class='file_time'>{{item.Dtime}}</view>
 						<view class='file_collect'>
 							<image src='file_collect'></image>
 						</view>
@@ -89,11 +89,11 @@
 
 				<view style='display:flex;' :id='index' @click='btn_preview' @longpress='showActionSheet3'>
 					<view class='type_block'>
-						<image src='item.type_icon'></image>
+						<image src='item.Dstatus_icon'></image>
 					</view>
 					<view class='file_info'>
-						<view class='file_name'>{{item.name}} ({{item.type}})</view>
-						<view class='file_time'>{{item.time}}</view>
+						<view class='file_name'>{{item.Dname}} ({{item.Dstatus}})</view>
+						<view class='file_time'>{{item.Dtime}}</view>
 						<view class='file_collect'>
 							<image src='file_collect'></image>
 						</view>
@@ -112,6 +112,10 @@
 </template>
 
 <script>
+	let that;
+	import {
+		getNewTokenServe
+	} from '../../utils/api.js'
 	import minActionSheet from '@/components/min-action-sheet/min-action-sheet'
 	export default {
 		components: {
@@ -127,24 +131,7 @@
 				index: '',
 				type: 'list', //默认为选择页面
 				role: 'attend',
-				file_list_prepare: [{
-					id: '1',
-					name: '年终总结',
-					type: 'pdf',
-					time: '2018-01-12',
-				}, {
-					name: '年终总结',
-					type: 'ppt',
-					time: '2018-01-12'
-				}, {
-					name: '年终总结',
-					type: 'word',
-					time: '2018-01-12'
-				}, {
-					name: '年终总结',
-					type: 'ppt',
-					time: '2018-01-12'
-				}],
+				file_list_prepare: [],
 				file_list_download: [{
 					name: '学习资料',
 					type: 'ppt',
@@ -166,7 +153,7 @@
 		},
 		onLoad(options) {
 			console.log(options);
-			let that = this
+			that = this
 			if (options.role == 'append') {
 				that.id = options.m_id;
 				that.role = options.role;
@@ -194,24 +181,17 @@
 			} else if (options.role == 'manage') {
 				that.id = options.m_id;
 				that.role = options.role;
-				// wx.request({
-				// 	url: 'https://www.viaviai.com/thz/sever/download.php',
-				// 	data: {
-				// 		'type': 'manage',
-				// 		'id': options.id
-				// 	},
-				// 	header: {},
-				// 	method: 'GET',
-				// 	dataType: 'json',
-				// 	responseType: 'text',
-				// 	success: function(res) {
-				// 		that.setData({
-				// 			file_list_prepare: res.data
-				// 		})
-				// 	},
-				// 	fail: function(res) {},
-				// 	complete: function(res) {},
-				// })
+				that.$http.get(that.baseurl + 'meetingapi/v1/file', {
+					params: {
+						role: 'manage',
+						mid: options.m_id
+					}
+				}).then(res => {
+					if (res.data.msg == 'ok') {
+						that.file_list_prepare = res.data.data
+						console.log(that.file_list_prepare);
+					}
+				}).catch()
 
 			} else if (options.role == 'collect') {
 
@@ -240,7 +220,7 @@
 		methods: {
 			// 上传文件
 			upfile() {
-				let that = this;
+
 				console.log('upfile');
 				wx.chooseMessageFile({
 					count: 1,
@@ -250,13 +230,21 @@
 						// 将文件信息付给tempFilePaths
 						that.tempFilePaths = res.tempFiles
 						console.log(that.tempFilePaths);
+						// 这里取统一的name,方便服务器取到,因为这里的name传到服务器时键的形式
+						// 这里直接把全部信息传给服务器,filePath传到服务器是值得形式
 						that.$http.upload(that.baseurl + 'meetingapi/v1/file/', {
-								filePath: that.tempFilePaths[0].path,
-								name: that.tempFilePaths[0].name,
+							name: 'filename',
+							filePath: that.tempFilePaths[0].path,
+							formData: {
+								fname: that.tempFilePaths[0].name,
+								mid: that.id
 							}
-
-						).then(res => {
-							console.log(res);
+						}, ).then(res => {
+							let data = JSON.parse(res.data)
+							if (data.msg == 'ok') {
+								that.file_list_prepare.push(data.data)
+								console.log(that.file_list_prepare);
+							}
 						}).catch();
 
 					}
@@ -307,6 +295,66 @@
 					itemList: ['预览文件', '收藏文件', '下载文件'],
 					success: function(res) {
 						console.log(res);
+					},
+					fail: function(res) {
+						console.log(res.errMsg);
+					}
+				});
+			},
+			showActionSheet2(e) {
+				let file_index = e.currentTarget.id
+				let file_id = that.file_list_prepare[file_index].id
+				console.log(file_id);
+				uni.showActionSheet({
+					itemList: ['预览文件', '隐藏文件', '收藏文件', '下载文件'],
+					success: function(res) {
+						console.log(res);
+						if (res.tapIndex == "0") {
+
+						} else if (res.tapIndex == '3') {
+							uni.showLoading({
+								title:'下载中',
+								mask:true
+							})
+							console.log('下载文件');
+							uni.downloadFile({
+								url: that.baseurl + 'meetingapi/v1/file/?file_id=' + file_id + '&mid=' + that.id + '&role=download',
+								header: {
+									token: getNewTokenServe()
+								},
+								success: (res) => {
+									uni.showToast({
+										title:'下载成功',
+										duration:2500
+									})
+									console.log(res);
+									var filePath = res.tempFilePath;
+										// 新页面打开文档
+									    // uni.openDocument({
+									    //   filePath: filePath,
+									    //   success: function (res) {
+									    //     console.log('打开文档成功');
+									    //   }
+									    // });
+										// 永久保存
+										uni.saveFile({
+											tempFilePath:filePath,
+											success(res) {
+												console.log(res);
+												uni.getSavedFileList({
+												  success: function (res) {
+												    console.log(res.fileList);
+												  }
+												});
+											},
+											fail(err) {
+												console.log('文件过大');
+											}
+										})
+
+								}
+							});
+						}
 					},
 					fail: function(res) {
 						console.log(res.errMsg);

@@ -20,11 +20,17 @@
 	/*每个页面公共css */
 	@import "colorui/main.css";
 	@import "colorui/icon.css";
+	
+	@import "static/uni/uni.css";
 .flex-r{
 	display: flex;
 }
 .flex-c{
 	display: flex;
 	flex-direction: column;
+}
+view {
+    font-size: 28upx;
+    line-height: 1.8;
 }
 </style>

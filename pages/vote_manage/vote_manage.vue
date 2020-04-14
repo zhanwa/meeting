@@ -174,16 +174,6 @@
 				m_id: '', //会议ID
 				focus: false, //input自动聚焦关闭
 				type: 'choose', //默认为选择页面
-				// enter: '../../static/denglu.png', //“进入”图标地址
-				// vote_icon: '../../static/denglu.png',
-				// vote_record: '../../static/denglu.png',
-				// vote_result: '../../static/denglu.png',
-				// preview: '../../static/denglu.png',
-				// add_question: '../../static/denglu.png',
-				// function: '../../static/denglu.png',
-				// title_time: '../../static/denglu.png',
-				// title_record: '../../static/denglu.png',
-				// title_photo: '../../static/denglu.png',
 				info: {}, //保存会议信息
 				vote: [], //保存投票列表,
 				vote_message:''  //投票详细信息

@@ -4,11 +4,12 @@
 		<view class="content">
 			<view v-show="current === 0">
 				<view class="forcard" v-for="item in m_list" :key="item.m_id">
-					<uni-card :title=item.m_title note="true" :is-shadow="true">
-						<text>{{item.m_content}}</text>
-						<text>{{item.m_place}}</text>
-						<text>{{item.b_time}}</text>
-						<uni-tag :text=item.mlabel> </uni-tag>
+					<uni-card :title=item.m_title note="true" :is-shadow="true" class="flex-c">
+						<text>简介:{{item.m_content}}</text>
+						<view class="tag flex">
+							<uni-tag :text=item.mlabel> </uni-tag>
+							<uni-tag text='good'> </uni-tag>
+						</view>
 						<template v-slot:footer>
 							<view class="footer-box flex-r">
 								<view v-if="item.mcreator_id == u_id" @click="nato(item.m_id,item.mcreator_id)">开始</view>
@@ -59,7 +60,7 @@
 			},
 			detail_meeting(m_id) {
 				uni.navigateTo({
-				    url: `../meeting_detail/meeting_detail?m_id=${m_id}`
+				    url: `../meeting_detail/meeting_detail?mid=${m_id}&type=append`
 				});
 			},
 			nato(m_id,mcreator_id) {

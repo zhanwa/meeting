@@ -18,7 +18,7 @@ http.interceptor.request((config, cancel) => { /* 请求之前拦截器 */
 	// }
 	config.header['token'] = getNewTokenServe()
 	if(config.method === 'UPLOAD'){
-		config.header['content-type']='multipart'
+		config.header['content-type']='multipart/form-data'
 	}
 
 	// if (!token) { // 如果token不存在，调用cancel 会取消本次请求，但是该函数的catch() 仍会执行

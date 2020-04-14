@@ -62,6 +62,17 @@
             "path" : "pages/file/file",
             "style" : {}
         }
+        ,{
+            "path" : "pages/user_message/user_message",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/qr_code/qr_code",
+            "style" : {}
+        },{
+            "path" : "pages/meeting_detail/meeting_change",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

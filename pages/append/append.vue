@@ -45,20 +45,20 @@
 				console.log(e.detail.index);
 				if (e.detail.index == 3) {
 					uni.navigateTo({
-						url: '../chat/chat?m_id=' + this.m_id
+						url: '../chat/chat?m_id=' + this.m_id+'&role='+this.role
 					})
 				} else if (e.detail.index == 4) {
 					uni.navigateTo({
-						url: '../lottery/lottery?m_id=' + this.m_id
+						url: '../lottery/lottery?m_id=' + this.m_id+'&role='+this.role
 					})
 				} else if(e.detail.index==1){
 					uni.navigateTo({
-						url: '../sign_in/sign_in?m_id=' + this.m_id,
+						url: '../sign_in/sign_in?m_id=' + this.m_id+'&role='+this.role
 						
 					});
 				} else if(e.detail.index == 2){
 					uni.navigateTo({
-						url: '../vote_manage/vote_manage?m_id=' + this.m_id
+						url: '../vote_manage/vote_manage?m_id=' + this.m_id+'&role='+this.role
 					})
 				}else if(e.detail.index == 5){
 					uni.navigateTo({
