@@ -47,7 +47,7 @@
 							uni.setStorageSync('SUID', res.data.u_id + '');
 							// uni.setStorageSync('SRAND', res.data.u_random + '');
 							uni.setStorageSync('SNAME', res.data.username + '');
-							uni.setStorageSync('SFACE', "http://192.168.2.104:8000" + res.data.image + '');
+							uni.setStorageSync('SFACE', this.baseurl + res.data.image + '');
 							uni.setStorageSync('STOKEN', res.data.token + '');
 							console.log("成功")
 							// 跳转
@@ -72,6 +72,13 @@
 			// 将option放到全局调用
 			pageOptions = option
 			_self = this;
+			// 判断有无用户会议更新,有就改变缓存,无就增加缓存
+			let Mmeeting_updata = uni.getStorageSync('Mmeeting_update')
+			if(!Mmeeting_updata){
+				uni.setStorageSync(
+					'Mmeeting_update','0'
+				)
+			};
 			// 获取code换取openid
 			uni.login({
 				success(res) {

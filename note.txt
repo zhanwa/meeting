@@ -1,1 +1,9 @@
 input要绑定value,不然就算数组更新了,但画面可能不同步
+
+@tap.stop阻止像上冒泡 uniapp @click好像不能阻止 .self阻止向下冒泡
+
+拆分的组件不要用onload,用mounted
+
+父组件传过来的值可以在子组件完全加载完后,使用this.$nextTick确保组件以加载完成 可是用this.xxx来接受到父组件传来的xxx
+
+forEach 不能使用break退出循环,可用捕捉异常方式退出

@@ -16,7 +16,9 @@
 					<view :id='Lindex' @longpress='del_grade'>
 						<view class='question_item'>
 							<image src='trophy'></image>
-							<view id='grade_index' class='question_item_text' @click="onTapDefault">{{Litem.grade}}</view>
+							<picker :range="lottery_leval" @change="leval_change" :id="Lindex">
+								<view>{{leval_number>-1?lottery_leval[leval_number]:'请选择奖品等级'}}</view>
+							</picker>
 						</view>
 					</view>
 					<view class='choice_block' v-for='(aitem,aindex) in Litem.awards' :key='aindex'>
@@ -128,8 +130,9 @@
 				type: 'set',
 				id: '',
 				isShow: false,
-				choose_function: -1,
+				leval_number: -1,
 				lottery_function: ['随机按停抽奖', '摇一摇抽奖', '拼手速抽奖', '根据弹幕数量抽奖'],
+				lottery_leval: ['特等奖', '一等奖', '二等奖', '三等奖', '参与奖', '幸运奖'],
 				lottery_list: [{
 					theme: '测试会议',
 					time: '2018-01-31',
@@ -224,21 +227,13 @@
 			},
 
 
-			onTapDefault(event) {
-				const that = this
-
-				that.$wuxPicker.init('default', {
-					items: ['特等奖', '一等奖', '二等奖', '三等奖', '鼓励奖', '参与奖', '幸运奖'],
-					onChange(value, values) {
-						console.log(value, values)
-
-						let index = event.currentTarget.id //获取问题在当前投票列表中的下标
-						let lotterys = that.data.lottery //获取当前页面的投票列表
-						lotterys[index].grade = values[0] //获取问题内容并设置
-						that.lottery= lotterys//更新投票列表
-
-					},
-				})
+			// 奖品等级改变
+			leval_change(e){
+				console.log(e);
+				this.leval_number = e.detail.value
+				let lottery_id = e.currentTarget.id
+				this.lottery[lottery_id].grade = this.lottery_leval[this.leval_number]
+				console.log(this.lottery);
 			},
 
 			//设置选项
@@ -308,65 +303,17 @@
 			},
 			// 发起抽奖
 			submit(){
-			    let that = this;
-			    let lottery = that.choose_function;
-			    if (lottery=='0'){
-			      lottery = 'random';
-			    }
-			
-			    console.log(lottery);
-			
-			    let lottery_function = {
-			      function: lottery,
-			      time: that.CurentTime(),
-			      range: 'barrage' //暂时暂定一种弹幕方式参与抽奖
-			    }
-			
-			    lottery = {
-			      lottery: that.lottery
-			    }
-			
-			    let lottery_form = [lottery, lottery_function];
-			
-			    console.log(lottery_form);
-			
-			    // wx.request({
-			    //   url: 'https://www.viaviai.com/thz/sever/manage.php',
-			    //   data: {
-			    //     'type': 'lottery', //操作类型为投票
-			    //     'from': 'wx',
-			    //     'id': that.id, //会议ID
-			    //     'lottery': lottery_form //投票列表
-			    //   },
-			    //   header: {},
-			    //   method: 'GET',
-			    //   dataType: 'json',
-			    //   responseType: 'text',
-			    //   success: function (res) {
-			    //     wx.showToast({
-			    //       title: '抽奖发起成功',
-			    //       icon: 'success',
-			    //       duration: 1500
-			    //     })
-			    //     setTimeout(function () {
-			    //       wx.hideToast()
-			    //       wx.navigateBack({
-			    //         delta: 1,
-			    //       })
-			    //     }, 2000)
-			    //   },
-			    //   fail: function (res) {
-			    //     wx.showToast({
-			    //       title: '抽奖发起失败',
-			    //       image: '../../images/hint1.png',
-			    //       duration: 1500
-			    //     })
-			    //     setTimeout(function () {
-			    //       wx.hideToast()
-			    //     }, 2000)
-			    //   },
-			    //   complete: function (res) { },
-			    // })
+			    let that = this;	
+				console.log(this.lottery);
+				console.log(that.mid);
+				that.$http.post('meetingapi/v1/lottery/',{
+					mid:that.id,
+					lottrey:that.lottery,
+					type:'admin_lottery'
+				}).then(res=>{
+					console.log(res);
+				}).catch()
+			    
 			  }
 		},
 		onLoad(options) {
@@ -374,7 +321,7 @@
 				title: '抽 奖 管 理'
 			})
 			let that = this;
-			that.id= options.id
+			that.id= options.m_id
 			;
 			this.type= options.type
 		

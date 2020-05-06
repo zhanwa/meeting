@@ -125,8 +125,6 @@
 			return {
 				// 保存上传文件的列表
 				tempFilePaths: '',
-				scrollTop: 0, //可滚动视图区域scroll-view竖向滚动条位置
-				choice: 0, //数值0为未开始会议列表、数值1为已完成会议列表
 				id: '', //会议ID
 				index: '',
 				type: 'list', //默认为选择页面
@@ -157,26 +155,17 @@
 			if (options.role == 'append') {
 				that.id = options.m_id;
 				that.role = options.role;
-				// wx.request({
-				// 	url: 'https://www.viaviai.com/thz/sever/download.php',
-				// 	data: {
-				// 		'id': options.id,
-				// 		'type': 'getAccessList',
-				// 		'openid': options.openid,
-				// 	},
-				// 	header: {},
-				// 	method: 'GET',
-				// 	dataType: 'json',
-				// 	responseType: 'text',
-				// 	success: function(res) {
-				// 		that.setData({
-				// 			file_list_prepare: res.data[0],
-				// 			file_list_download: res.data[1]
-				// 		})
-				// 	},
-				// 	fail: function(res) {},
-				// 	complete: function(res) {},
-				// })
+				that.$http.get(that.baseurl + 'meetingapi/v1/file', {
+					params: {
+						role: 'append',
+						mid: options.m_id
+					}
+				}).then(res => {
+					if (res.data.msg == 'ok') {
+						that.file_list_prepare = res.data.data
+						console.log(that.file_list_prepare);
+					}
+				}).catch()
 
 			} else if (options.role == 'manage') {
 				that.id = options.m_id;
@@ -290,11 +279,89 @@
 			// },
 			showActionSheet1(e) {
 				let file_index = e.currentTarget.id
+				let file_id = that.file_list_prepare[file_index].id
 				console.log(file_index);
 				uni.showActionSheet({
 					itemList: ['预览文件', '收藏文件', '下载文件'],
 					success: function(res) {
 						console.log(res);
+						if (res.tapIndex == "0") {
+							uni.showLoading({
+								title: '加载中',
+								mask: true
+							})
+							console.log('预览文件');
+							uni.downloadFile({
+								url: that.baseurl + 'meetingapi/v1/file/?file_id=' + file_id + '&mid=' + that.id + '&role=download',
+								header: {
+									token: getNewTokenServe()
+								},
+								success: (res) => {
+									uni.showToast({
+										title: '打开成功',
+										duration: 2500
+									})
+									console.log(res);
+									var filePath = res.tempFilePath;
+									//新页面打开文档
+									uni.openDocument({
+										filePath: filePath,
+										success: function(res) {
+											console.log('打开文档成功');
+										}
+									});
+								},
+								complete:(res)=>{
+									uni.hideLoading()
+								}
+							})
+						} else if (res.tapIndex == '2') {
+							uni.showLoading({
+								title: '下载中',
+								mask: true
+							})
+							console.log('下载文件');
+							uni.downloadFile({
+								url: that.baseurl + 'meetingapi/v1/file/?file_id=' + file_id + '&mid=' + that.id + '&role=download',
+								header: {
+									token: getNewTokenServe()
+								},
+								success: (res) => {
+									uni.showToast({
+										title: '下载成功',
+										duration: 2500
+									})
+									console.log(res);
+									var filePath = res.tempFilePath;
+									// 新页面打开文档
+									// uni.openDocument({
+									//   filePath: filePath,
+									//   success: function (res) {
+									//     console.log('打开文档成功');
+									//   }
+									// });
+									// 永久保存
+									uni.saveFile({
+										tempFilePath: filePath,
+										success(res) {
+											console.log(res);
+											uni.getSavedFileList({
+												success: function(res) {
+													console.log(res.fileList);
+												}
+											});
+										},
+										fail(err) {
+											console.log('文件过大');
+										}
+									})
+						
+								},
+								complete:(res)=>{
+									uni.hideLoading()
+								}
+							});
+						}
 					},
 					fail: function(res) {
 						console.log(res.errMsg);
@@ -310,11 +377,36 @@
 					success: function(res) {
 						console.log(res);
 						if (res.tapIndex == "0") {
-
+							uni.showLoading({
+								title: '加载中',
+								mask: true
+							})
+							console.log('预览文件');
+							uni.downloadFile({
+								url: that.baseurl + 'meetingapi/v1/file/?file_id=' + file_id + '&mid=' + that.id + '&role=download',
+								header: {
+									token: getNewTokenServe()
+								},
+								success: (res) => {
+									uni.showToast({
+										title: '打开成功',
+										duration: 2500
+									})
+									console.log(res);
+									var filePath = res.tempFilePath;
+									//新页面打开文档
+									uni.openDocument({
+										filePath: filePath,
+										success: function(res) {
+											console.log('打开文档成功');
+										}
+									});
+								},
+							})
 						} else if (res.tapIndex == '3') {
 							uni.showLoading({
-								title:'下载中',
-								mask:true
+								title: '下载中',
+								mask: true
 							})
 							console.log('下载文件');
 							uni.downloadFile({
@@ -324,33 +416,33 @@
 								},
 								success: (res) => {
 									uni.showToast({
-										title:'下载成功',
-										duration:2500
+										title: '下载成功',
+										duration: 2500
 									})
 									console.log(res);
 									var filePath = res.tempFilePath;
-										// 新页面打开文档
-									    // uni.openDocument({
-									    //   filePath: filePath,
-									    //   success: function (res) {
-									    //     console.log('打开文档成功');
-									    //   }
-									    // });
-										// 永久保存
-										uni.saveFile({
-											tempFilePath:filePath,
-											success(res) {
-												console.log(res);
-												uni.getSavedFileList({
-												  success: function (res) {
-												    console.log(res.fileList);
-												  }
-												});
-											},
-											fail(err) {
-												console.log('文件过大');
-											}
-										})
+									// 新页面打开文档
+									// uni.openDocument({
+									//   filePath: filePath,
+									//   success: function (res) {
+									//     console.log('打开文档成功');
+									//   }
+									// });
+									// 永久保存
+									uni.saveFile({
+										tempFilePath: filePath,
+										success(res) {
+											console.log(res);
+											uni.getSavedFileList({
+												success: function(res) {
+													console.log(res.fileList);
+												}
+											});
+										},
+										fail(err) {
+											console.log('文件过大');
+										}
+									})
 
 								}
 							});

@@ -2,23 +2,23 @@
 	<view class="create_meeting">
 		<view class="cu-form-group">
 			<view class="title">会议标题</view>
-			<input placeholder="请输入会议标题" name="input" v-model="t_value"></input>
+			<input placeholder="请输入会议标题" name="input" @input='chang_title' :value="t_value"></input>
 		</view>
 		<view class="cu-form-group">
 			<view class="title">会议类型</view>
-			<picker @change="PickerChange" :value="type" :range="picker">
+			<picker @change="PickerChange" :range="picker">
 				<view class="picker">
-					{{type>-1?picker[type]:'会议类型'}}
+					{{type>-1?picker[type]:m_detail.gcontent?m_detail.gcontent:'会议类型'}}
 				</view>
 			</picker>
 		</view>
 		<view class="cu-form-group">
 			<view class="title">人数限制</view>
-			<input placeholder="不能超过200人" name="input" v-model="limit"></input>
+			<input placeholder="不能超过200人" type="number" @input='chang_limit' :value="limit"></input>
 		</view>
 		<view class="cu-form-group">
 			<view class="title">会议秘钥</view>
-			<input placeholder="请输入参加秘钥" name="input" v-model="s_value"></input>
+			<input placeholder="请输入参加秘钥" name="input" @input='chang_secret' :value="s_value"></input>
 		</view>
 
 		<view class="cu-form-group" @tap="showModal" data-target="ChooseModal">
@@ -47,7 +47,7 @@
 
 		<view class="cu-form-group">
 			<view class="title">会议地点</view>
-			<input placeholder="请输入会议地点" name="input" v-model="l_value"></input>
+			<input placeholder="请输入会议地点" name="input" @input='chang_location' :value="l_value"></input>
 			<text class='cuIcon-locationfill text-orange' @click="location"></text>
 		</view>
 		<view class="cu-form-group margin-top">
@@ -85,9 +85,11 @@
 
 		<view class="cu-form-group align-start margin-top">
 			<view class="title">会议简介</view>
-			<textarea maxlength="-1" :disabled="modalName!=null" @input="textareaBInput" placeholder="请输入会议简介"></textarea>
+			<textarea :value='d_value' maxlength="-1" @input="textareaBInput" placeholder="请输入会议简介"></textarea>
 		</view>
-		<button type="primary" class="submit" @click="submit">创建会议</button>
+		<button v-if="chang_flag == 'put'" type="primary" class="submit" @click="chang_meeting">修改会议</button>
+		<button v-else type="primary" class="submit" @click="submit">创建会议</button>
+		
 	</view>
 </template>
 
@@ -157,11 +159,34 @@
 					checked: false
 				}],
 				// 修改会议时传过来的mid
-				mid:''
+				mid: '',
+				// 会议详细数据
+				m_detail: [],
+				// 修改会议标志
+				chang_flag:'',
+				// 会议数量加一标志
+				Mmeeting_update:0
 
 			}
 		},
 		methods: {
+			// 标题改变
+			chang_title(e) {
+				this.t_value = e.detail.value
+				console.log(e);
+			},
+			// 人数限制改变
+			chang_limit(e) {
+				this.limit = e.detail.value
+			},
+			// 会议秘钥改变
+			chang_secret(e) {
+				this.s_value = e.detail.value
+			},
+			// 位置改变
+			chang_location(e) {
+				this.l_value = e.detail.value
+			},
 			// 有点bug,以后再说
 			ChooseCheckbox(e) {
 				let items = this.checkbox;
@@ -252,10 +277,13 @@
 				return `${year}-${month}-${day}`;
 			},
 			submit() {
+				let that = this
 				console.log(this.t_value, this.d_value, this.s_value, this.start_date, this.style);
 				let date = this.date + " " + this.time
 				if (!this.t_value || !this.s_value) {
-					console.log('不能为空');
+					uni.showToast({
+						title:'标题不能为空'
+					})
 					return
 				}
 				this.$http.post("meetingapi/v1/setmeeting/", {
@@ -277,12 +305,46 @@
 					console.log(mid);
 					console.log(res.data.msg);
 					if (res.data.msg == 'ok') {
-						
-						uni.navigateTo({
-							url: '../meeting_detail/meeting_detail?mid='+mid+'&type=manage',
+						// *号和parseInt等一样可将字符串转为数字
+						let up_num = that.Mmeeting_update + 1;
+						uni.setStorageSync('Mmeeting_update',up_num+'')
+						uni.redirectTo({
+							url: '../meeting_detail/meeting_detail?mid=' + mid + '&type=manage',
 							success() {
 								uni.showToast({
-									title:'创建成功'
+									title: '创建成功'
+								})
+							}
+						})
+					}
+				}).catch(err => {
+					console.log(err);
+				})
+			},
+			// 修改会议
+			chang_meeting(){
+				let that = this;
+				this.$http.put("meetingapi/v1/setmeeting/", {
+					mid:this.mid,
+					title: this.t_value,
+					dec: this.d_value,
+					serect: this.s_value,
+					location: this.l_value,
+					label: this.label,
+					type: this.style,
+					limit: this.limit,
+					start_date: this.start_date,
+					start_time: this.start_time,
+					stop_date: this.stop_date,
+					stop_time: this.stop_time
+				}).then(res => {
+					console.log(res);
+					if (res.data.msg == 'ok') {
+						uni.redirectTo({
+							url: '../meeting_detail/meeting_detail?mid=' + that.mid + '&type=manage',
+							success() {
+								uni.showToast({
+									title: '修改成功'
 								})
 							}
 						})
@@ -292,9 +354,44 @@
 				})
 			}
 		},
+		
 		onLoad(options) {
-			if(options.type == 'put'){
-				this.mid = options.mid;	
+			let that = this
+			uni.getStorage({
+			    key: 'Mmeeting_update',
+			    success: function (res) {
+					that.Mmeeting_update = parseInt(res.data)
+					console.log(that.Mmeeting_update);
+			    }
+			});
+			if (options.type == 'put') {
+				uni.setNavigationBarTitle({
+					title: '修改会议'
+				});
+				this.chang_flag = options.type
+				this.mid = options.mid;
+				// 获取会议信息填充表格以便修改
+				this.$http.get('meetingapi/v1/getmeeting', {
+					params: {
+						type: 'getmeetingdetail',
+						mid: options.mid
+					}
+				}).then(res => {
+
+					this.m_detail = res.data.data
+					this.t_value = this.m_detail.m_title;
+					this.s_value = this.m_detail.vcontent;
+					this.l_value = this.m_detail.m_place;
+					this.d_value = this.m_detail. m_content;
+					this.limit = this.m_detail.limits;
+					this.style = this.m_detail.gcontent;
+					
+					this.start_date = this.m_detail.e_time;
+					this.start_time = this.m_detail.c_time;
+					this.stop_date = this.m_detail.s_time;
+					this.stop_time = this.m_detail.b_time;
+					this.label = JSON.parse(this.m_detail.mlabel)
+				}).catch()
 			}
 		}
 	}

@@ -3,7 +3,7 @@
 		<!-- 个人二维码 -->
 		<view v-if='type=="personage"' class='container'>
 			<view class='qr_code'>
-				<canvas style="width: 200px; height: 200px; margin-top:86rpx;" canvas-id="personage_qrcode"></canvas>
+				<canvas  canvas-id="qrcode" style="width: 200px;height: 200px;" />
 				<view class='info_block'>
 					<image class="userinfo-avatar" src="userInfo.avatarUrl"></image>
 					<view class="userinfo-nickname"> <text>userInfo.nickName</text></view>
@@ -22,7 +22,7 @@
 		<!-- 会议二维码 -->
 		<view v-if='type=="meeting_code"' class='container'>
 			<view class='qr_code'>
-				<canvas style="width: 200px; height: 200px; margin-top:86rpx;" canvas-id="sign_in_qrcode"></canvas>
+				<canvas  canvas-id="qrcode" style="width: 200px;height: 200px;" />
 				<view class='info_block' style='height:90rpx;justify-content: center;'>
 					<view class="userinfo-nickname"><text>theme</text></view>
 				</view>
@@ -39,16 +39,18 @@
 				// 判断是那种类型的二维码页面
 				type: '',
 				// 会议id
-				mid:''
+				mid:'',
+				// 会议标识符
+				flag:''
 			};
 		},
 		methods: {
-			make(mid) {
+			make(e) {
 				uQRCode.make({
 					canvasId: 'qrcode',
 					componentInstance: this,
-					text: mid,
-					size: 215,
+					text: e,
+					size: 200,
 					margin: 10,
 					backgroundColor: '#ffffff',
 					foregroundColor: '#000000',
@@ -63,7 +65,16 @@
 		onLoad(option) {
 			this.type = option.type;
 			this.mid = option.mid;
-			this.make(option.mid)
+			console.log(option);
+			// 如果是会议,接受到会议标识符
+			if(this.type == 'meeting_code'){
+				this.flag = option.flag
+				console.log(this.type,option.flag,typeof option.flag);
+				this.make(option.flag)
+			}else if(this.type == 'sign_in'){
+				this.make(option.mid)
+			}
+			
 		}
 	}
 </script>

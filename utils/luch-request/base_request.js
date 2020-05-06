@@ -4,6 +4,7 @@ const http = new Request()
 http.setConfig((config) => { /* 设置全局配置 */
 	// config.baseUrl = 'http://127.0.0.1:8000/' /* 根域名不同 */
 	config.baseUrl = 'http://192.168.2.104:8000/'
+	// config.baseUrl = 'http://free.shenzhuo.vip:13104/'
 	config.header = {
 		...config.header
 	}

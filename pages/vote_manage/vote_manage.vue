@@ -22,12 +22,6 @@
 					</view>
 					<text>投票问题记录</text>
 				</view>
-				<view class='sign_block' @click='btn_statistics'>
-					<view class='sign_icon'>
-						<image src='vote_result'></image>
-					</view>
-					<text style='border-bottom-width:0;'>投票结果统计</text>
-				</view>
 			</view>
 
 		</view>
@@ -114,35 +108,7 @@
 		</view>
 
 		<view v-if='type=="record_detail"'>
-			<view class='cut'></view>
-			<view class='function_block'>
-				<view class='title_block'>
-					<view class='title_icon'>
-						<image src='title_time'></image>
-					</view>
-					<text>Time: {{vote_message.time}}</text>
-				</view>
-				<view class='title_block'>
-					<view class='title_icon'>
-						<image src='title_time'></image>
-					</view>
-					<text>title: {{vote_message.question}}</text>
-				</view>
-			</view>
-			<view class='cut'></view>
-
-			<view v-for='(item,oindex) in vote_message.choices' :key='oindex' class='record_block'>
-
-				<!-- <text v-if='item.radio=="true"' class='record_question'>{{qindex+1}}(单选){{item.question}}</text>
-				<text v-if='item.radio=="false"' class='record_question'>{{qindex+1}}(多选){{item.question}}</text> -->
-				<text>{{oindex+1}}. {{item}}</text>
-				<!-- <view v-for='(option,oindex) in item.choices' :key='oindex' class='record_choice'>
-					<text>(oindex+1 ). {{option}}</text>
-				</view> -->
-
-			</view>
-
-
+			<vote-result :vote_message='vote_message'></vote-result>
 		</view>
 
 		<view v-if='type=="record_all"'>
@@ -166,10 +132,11 @@
 </template>
 
 <script>
+	import voteResult from './vote_result.vue'
 	export default {
+		components:{voteResult},
 		data() {
 			return {
-
 				updata: true, //数据更新标志
 				m_id: '', //会议ID
 				focus: false, //input自动聚焦关闭
@@ -187,22 +154,19 @@
 
 			this.type = options.type;
 			this.mid = options.m_id;
-			this.info = {
-				theme: options.m_id,
-				time: options.m_id
-			}
+			
 
 			let that = this;
 			if (options.type == 'set') { //如果操作类型为设置投票
-
-				//当页面为设置投票时设置标题为投票设置
-
-				//默认添加两个问题，每个问题有两个默认答案
-				this.add_question()
+				
+				//添加问题，每个问题有两个默认答案
 				this.add_question()
 
 			} else if (options.type == 'record_all') { //如果操作类型为发起过的投票列表总览
-
+				this.info = {
+					theme: options.m_id,
+					time: options.m_id
+				}
 				//请求后端投票总列表的数据
 				this.$http.get('meetingapi/v1/vote/', {
 					params: {
@@ -211,21 +175,11 @@
 				}).then(res => {
 					console.log(res);
 					this.vote = res.data.data
+					console.log(this.vote);
 				}).catch()
-
-
-
 			} else if (options.type == 'record_detail') { //如果操作类型为投票记录详情
 				this.vote_message = JSON.parse(options.vote_message)
 				console.log(this.vote_message);
-				// this.$http.get('meetingapi/v1/vote/', {
-				// 	params: {
-				// 		mid: that.mid
-				// 	}
-				// }).then(res => {
-				// 	console.log(res);
-				// 	this.vote = res.data.data
-				// }).catch()
 			}
 		},
 		methods: {
@@ -387,9 +341,7 @@
 				let time = this.info.m_id //获取当前会议的时间
 				uni.navigateTo({
 					url: 'vote_manage?type=record_all&m_id=' + that.mid + '&theme=' + theme + '&time=' + time, //转向当前页面（id为会议ID、theme为会议主题、time为会议时间）
-					success: function(res) {},
-					fail: function(res) {},
-					complete: function(res) {},
+					
 				})
 			},
 
@@ -398,12 +350,9 @@
 
 				let that = this;
 				let vote_list = JSON.stringify(that.vote);
-
+				console.log(vote_list);
 				uni.navigateTo({
 					url: '../vote_attend/vote_attend?vote=' + vote_list + '&type=preview',
-					success: function(res) {},
-					fail: function(res) {},
-					complete: function(res) {},
 				})
 
 			},
@@ -413,7 +362,7 @@
 				let that = this;
 				let count = 0;
 				let vote_list = new Array();
-
+				console.log(this.vote);
 				//遍历投票数组去除空问题数组
 				for (let i = 0; i < that.vote.length; ++i) {
 					if (that.vote[i].question.length != 0) {
@@ -434,14 +383,15 @@
 					if (res.data.msg == 'ok') {
 						uni.showToast({
 							title: '发起投票成功',
-							duration: 1500
+							duration: 1500,
+							success() {
+								console.log('调了吗');
+								uni.navigateTo({
+									url: 'vote_manage?type=record_all&m_id=' + that.mid + '&theme=' + that.mid + '&time=' + that.mid, //转向当前页面（id为会议ID、theme为会议主题、time为会议时间）
+									
+								})
+							}
 						})
-						setTimeout(function() {
-							uni.hideToast()
-							uni.navigateBack({
-								delta: 1,
-							})
-						}, 2000)
 					} else {
 						uni.showToast({
 							title: '失败'

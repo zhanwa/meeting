@@ -91,7 +91,9 @@
 				QR: true,
 				personage: true,
 				WIFI: false,
-				sign_in: "false"
+				sign_in: "false",
+				// 用户头像
+				avator:uni.getStorageSync('SFACE')
 			}
 		},
 		methods: {
@@ -109,6 +111,7 @@
 						}).then(res => {
 							console.log(res);
 							if (res.data.data == 'success') {
+								that.$Socket.nsend(JSON.stringify({type:'sign',avator:that.avator}))
 								uni.showToast({
 									title: "签到成功"
 								});

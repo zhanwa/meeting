@@ -73,6 +73,18 @@
             "path" : "pages/meeting_detail/meeting_change",
             "style" : {}
         }
+        ,{
+            "path" : "pages/vote_attend/vote_attend",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/lottery_append/lottery_append",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/lottery_append/shark_lottery",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",

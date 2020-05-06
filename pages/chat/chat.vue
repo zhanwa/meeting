@@ -1,19 +1,18 @@
 <template>
 	<view class="my_chat">
-		<scroll-view class="msg-list" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop"
-		 :scroll-into-view="scrollToView" >
-			<view class="cu-chat">
-				<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}">
-					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
-					<view class="main">
-						<view class="content bg-green shadow">
-							<text>{{item.msg}}</text>
-						</view>
+		<scroll-view class="cu-chat" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :style="{'height':screen_height}">
+	<!-- 	<view class="cu-chat"> -->
+			<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}" :id="index">
+				<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
+				<view class="main">
+					<view class="content bg-green shadow">
+						<text>{{item.msg}}</text>
 					</view>
-					<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
-					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
 				</view>
-				<!-- <view class="cu-item">
+				<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
+				<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
+			</view>
+			<!-- <view class="cu-item">
 				<view class="cu-avatar radius" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big143004.jpg);"></view>
 				<view class="main">
 					<view class="content shadow">
@@ -21,7 +20,7 @@
 					</view>
 				</view>
 			</view> -->
-			</view>
+		<!-- </view> -->
 		</scroll-view>
 
 		<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
@@ -45,14 +44,19 @@
 		onLoad(option) {
 			this.m_id = option.m_id;
 			_self = this;
+			uni.getSystemInfo({
+				success(res) {
+					_self.screen_height = (res.windowHeight - 55)+'px'
+
+				}
+			})
 			// 进入这个页面的时候创建websocket连接【整个页面随时使用】
 			this.connectSocketInit();
 		},
 		data() {
 			return {
-				scrollAnimation:false,
-				scrollTop:0,
-				scrollToView:'',
+				scrollAnimation: false,
+				scrollTop: 0,
 				// 屏幕高度
 				screen_height: '',
 				// 限制发送频率
@@ -82,13 +86,6 @@
 			// 输入框聚焦
 			InputFocus(e) {
 				this.InputBottom = e.detail.height
-				// 获取屏幕高度
-				// uni.getSystemInfo({
-				// 	success(res) {
-				// 		console.log(res);
-				// 		_self.screen_height = res.windowHeight
-				// 	}
-				// })
 			},
 			// 输入框失去焦点
 			InputBlur(e) {
@@ -120,13 +117,9 @@
 					this.socketTask.onMessage((res) => {
 						console.log("收到服务器内容：" + res.data);
 						let msgdata = JSON.parse(res.data)
-						this.$nextTick(function() {
-							// 滚动到底
-							this.scrollToView = 'msg'+ msgdata.msg
-						});
 						this.barrage = this.barrage.concat(msgdata)
 						console.log(this.barrage);
-						
+
 						// let resp = JSON.parse(res.data)
 						// if(resp.type == 'me'){
 						// 	this.mybarrage=this.mybarrage.concat(resp)
@@ -203,19 +196,29 @@
 				}
 
 			},
-			// scrollToBottom() {
-			// 	let that = this;
-			// 	let query = uni.createSelectorQuery();
-			// 	query.select('.cu-chat').boundingClientRect();
-			// 	query.exec((res) => {
-			// 			console.log(res);
-			// 		})
-			// 	}
+			scrollToBottom() {
+				let that = this;
+				let query = uni.createSelectorQuery();
+				query.select('.cu-chat').fields({
+					size:true,
+					scrollOffset:true
+				},data=>{
+					console.log(data);
+					that.scrollTop = data.scrollHeight
+					console.log(data.scrollTop);
+				}).exec();
+
+			}
 
 		},
-		mounted() {
-			// 判断当前信息框的高度是否触底
-			this.scrollToBottom()
+		// 监听事件
+		watch:{
+			// 监听指点滚动变化 可有两个参数,第一个为新值,第二个为旧值
+			barrage(value){
+				this.$nextTick(function(){
+					this.scrollToBottom()
+				})
+			}
 		}
 	}
 </script>

@@ -18,7 +18,11 @@
 					<text class="cuIcon-discoverfill text-blue"></text>
 					<text class="text-grey"> {{item.name}}</text>
 				</navigator>
+				<view class="action" v-if="item.name == '我创建的会议' && userInfo.Mmeeting_update != '0'">
+					<view class="cu-tag round bg-green lg">{{userInfo.Mmeeting_update}}</view>
+				</view>
 			</view>
+			
 
 		</view>
 		<button type="primary" @click="scanf()">扫一扫</button>
@@ -40,6 +44,7 @@
 				userInfo: {
 					username: '',
 					useravator: '',
+					Mmeeting_update:''
 				},
 				// 页面信息
 				pageInfo: [{
@@ -105,10 +110,11 @@
 			},
 
 		},
-		onLoad() {
+		onShow() {
 			_self = this
 			this.userInfo.useravator = uni.getStorageSync('SFACE');
 			this.userInfo.username = uni.getStorageSync('SNAME');
+			this.userInfo.Mmeeting_update = uni.getStorageSync('Mmeeting_update');
 			console.log(this.userInfo);
 			console.log('我是主页');
 		}

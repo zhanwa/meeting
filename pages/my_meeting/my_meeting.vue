@@ -6,7 +6,9 @@
 				<text>{{item.m_content}}</text>
 				<text>{{item.m_place}}</text>
 				<text>{{item.b_time}}</text>
-				<uni-tag :text=item.mlabel> </uni-tag>
+				<view class="tag flex">
+					<uni-tag v-for="(label,index) in item.mlabel" :key='index' :text=label.name> </uni-tag>
+				</view>
 				<template v-slot:footer>
 					<view class="footer-box flex-r">
 						<view v-if="type == 'create'">开始</view>
@@ -58,6 +60,7 @@
 		},
 		onLoad(option) {
 			this.type = option.type
+			uni.setStorageSync('Mmeeting_update','0')
 			let u_id = uni.getStorageSync("SUID")
 			if (this.type == 'create') {
 				this.$http.get('meetingapi/v1/setmeeting/', {
@@ -67,6 +70,11 @@
 					}
 				}).then(res => {
 					this.m_list = res.data.data.reverse()
+					console.log(this.m_list);
+					this.m_list.forEach((el,index)=>{
+						let s = JSON.parse(el.mlabel)
+						this.m_list[index].mlabel = s
+					})
 				}).catch(err => {
 					console.log(err);
 				})
@@ -78,7 +86,13 @@
 						u_id: u_id
 					}
 				}).then(res => {
+					
 					this.m_list = res.data.data.reverse()
+					
+					this.m_list.forEach((el,index)=>{
+						let s = JSON.parse(el.mlabel)
+						this.m_list[index].mlabel = s
+					})
 				}).catch(err => {
 					console.log(err);
 				})
