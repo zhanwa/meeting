@@ -9,13 +9,13 @@
 		{
 			"path": "pages/current_conference/current_conference",
 			"style": {
-				"navigationBarTitleText": "当前"
+				"navigationBarTitleText": "会议"
 			}
 		},
 		{
 			"path": "pages/home_page/home_page",
 			"style": {
-				"navigationBarTitleText": "首页"
+				"navigationBarTitleText": "好友"
 			}
 		}, {
 				"path": "pages/user_center/user_center",
@@ -85,6 +85,18 @@
             "path" : "pages/lottery_append/shark_lottery",
             "style" : {}
         }
+        ,{
+            "path" : "pages/feedback/feedback",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/my_award/my_award",
+            "style" : {}
+        }
+        ,{
+            "path" : "pages/announce/announce",
+            "style" : {}
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -98,13 +110,13 @@
 		"backgroundColor": "#555555", // 背景色(微信小程序下拉刷新可见)
 		"list": [{
 				"pagePath": "pages/home_page/home_page",
-				"text": "首頁",
+				"text": "好友",
 				"iconPath": "static/Homehomepagemenu.png",
 				"selectedIconPath": "static/Homehomepagemenu.png"
 			},
 			{
 				"pagePath": "pages/current_conference/current_conference",
-				"text": "当前",
+				"text": "会议",
 				"iconPath": "static/iconsp1.png",
 				"selectedIconPath": "static/iconsp1.png"
 			},

@@ -5,8 +5,8 @@
 			<view class='qr_code'>
 				<canvas  canvas-id="qrcode" style="width: 200px;height: 200px;" />
 				<view class='info_block'>
-					<image class="userinfo-avatar" src="userInfo.avatarUrl"></image>
-					<view class="userinfo-nickname"> <text>userInfo.nickName</text></view>
+					<image class="userinfo-avatar" :src="myname.avator"></image>
+					<view class="userinfo-nickname"> <text>{{myname.name}}</text></view>
 				</view>
 			</view>
 		</view>
@@ -41,7 +41,8 @@
 				// 会议id
 				mid:'',
 				// 会议标识符
-				flag:''
+				flag:'',
+				myname:''
 			};
 		},
 		methods: {
@@ -73,6 +74,9 @@
 				this.make(option.flag)
 			}else if(this.type == 'sign_in'){
 				this.make(option.mid)
+			}else if(this.type == 'personage'){
+				this.myname = JSON.parse( option.name)
+				this.make(option.uid)
 			}
 			
 		}

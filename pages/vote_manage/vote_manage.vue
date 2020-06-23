@@ -123,7 +123,7 @@
 
 			<view v-for='(item,qindex) in vote' :id='qindex' :key='qindex' class='vote_record_block' @click='btn_detail_record'>
 				<text class='vote_id'>{{qindex+1}}</text>
-				<text class='vote_time'>{{item.time}}</text>
+				<text class='vote_time'>{{item.question}}</text>
 			</view>
 
 		</view>

@@ -22,18 +22,10 @@
 				<view class='sign_block' style='border-bottom-width: 0;'>
 					<text>个人信息签到</text>
 					<view class='sign_in' @click='btn_personage'>
-						<image v-if='personage_sign=="true"' src='../../static/Homehomepagemenu.png'></image>
-						<image v-if='personage_sign=="false"' src='../../static/denglu.png'></image>
+						<image v-if='personage_sign=="true"' src='../../static/qiandao.png'></image>
+						<image v-if='personage_sign=="false"' src='../../static/qiandao.png'></image>
 					</view>
 				</view>
-
-				<!-- <view class='sign_block' style='border-bottom-width: 0;'>
-		      <text>WIFI签到</text>
-		      <view class='sign_in' @click='btn_WIFI'>
-		        <image v-if='WIFI_sign=="true"' src='open'></image>
-		        <image v-if='WIFI_sign=="false"' src='close'></image>
-		      </view>
-		    </view> -->
 
 			</view>
 
@@ -60,15 +52,6 @@
 					</view>
 					<text style='border-bottom-width: 0;'>个人信息签到</text>
 				</view>
-
-				<!-- <view class='sign_more_block' @click='more_WIFI'>
-		        <view class='sign_icon'><image src='wifi_icon'></image></view>
-		        <text style='border-bottom-width: 0;'>WIFI签到</text>
-		      </view> -->
-
-				<!-- <view class='sign_block' @click='more_WIFI'><text>WIFI签到</text></view>
-		    <view class='sign_block' @click='more_QR'><text>二维码签到</text></view>
-		    <view class='sign_block'  style='border-bottom-width: 0;' @click='more_personage'><text>个人信息签到</text></view> -->
 			</view>
 
 			<!-- 签到墙状态 -->

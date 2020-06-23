@@ -7,6 +7,7 @@
 					<image src='title_file'></image>
 				</view>
 				<text>文件管理</text>
+				<button type="primary" @click="upfile" size="mini">上传文件</button>
 			</view>
 
 			<view class='cut'></view>
@@ -31,7 +32,7 @@
 				</view>
 
 			</view>
-			<button type="primary" @click="upfile">上传文件</button>
+			
 			<view class='tip'>Tip：长按文件执行操作</view>
 
 		</view>
@@ -130,23 +131,7 @@
 				type: 'list', //默认为选择页面
 				role: 'attend',
 				file_list_prepare: [],
-				file_list_download: [{
-					name: '学习资料',
-					type: 'ppt',
-					time: '2018-01-12'
-				}, {
-					name: '学习资料',
-					type: 'ppt',
-					time: '2018-01-12'
-				}, {
-					name: '学习资料',
-					type: 'ppt',
-					time: '2018-01-12'
-				}, {
-					name: '学习资料',
-					type: 'ppt',
-					time: '2018-01-12'
-				}]
+				
 			};
 		},
 		onLoad(options) {
@@ -239,44 +224,7 @@
 					}
 				})
 			},
-			// showActionSheet1() {
-			// 	this.$refs.as.handleShow({
-			// 		slot:'文件操作',
-			// 		actions: [{
-			// 				name: '查看文件',
-			// 				icon: 'iconfont active',
-			// 				color: '#007aff'
-			// 			},
-			// 			{
-			// 				name: '收藏文件',
-			// 				image: 'http://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
-			// 			},
-			// 			{
-			// 				name: '下载文件',
-			// 				icon: 'iconfont active',
-			// 				color: '#007aff',
-			// 				image: 'http://img-cdn-qiniu.dcloud.net.cn/new-page/uni.png'
-			// 			}
-			// 		],
-			// 		success: (res) => {
-			// 			switch (res.id) {
-			// 				// -1代表取消按钮
-			// 				case -1:
-			// 					console.log(res)
-			// 					break
-			// 				case 0:
-			// 					console.log(res)
-			// 					break
-			// 				case 1:
-			// 					console.log(res)
-			// 					break
-			// 				case 2:
-			// 					console.log(res)
-			// 					break
-			// 			}
-			// 		}
-			// 	})
-			// },
+			
 			showActionSheet1(e) {
 				let file_index = e.currentTarget.id
 				let file_id = that.file_list_prepare[file_index].id

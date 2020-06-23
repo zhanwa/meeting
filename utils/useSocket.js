@@ -7,8 +7,13 @@ const Socket =new socket({
 	interValTime: 2000,
     onOpen(res) {
         console.log('连接成功')
-		// this.nsend(JSON.stringify('nihao'));
+		let uid = parseInt(uni.getStorageSync('SUID'))
+		if(uid){
+			this.nsend(JSON.stringify({type:'login',uid: uid}))
+		}
+		
     },
+	
     onClose(err) {
         console.log('关闭了连接')
     },

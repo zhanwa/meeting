@@ -20,6 +20,10 @@
 								<view>{{leval_number>-1?lottery_leval[leval_number]:'请选择奖品等级'}}</view>
 							</picker>
 						</view>
+						<view class="flex-r" style="width: 80%; margin: 0 auto; justify-content: space-between;">
+							<view ><text>选择获奖人数：</text></view>
+							<uni-number-box @change="limit_change($event,Lindex)"></uni-number-box>
+						</view>
 					</view>
 					<view class='choice_block' v-for='(aitem,aindex) in Litem.awards' :key='aindex'>
 						<view :id='aindex' :data-grade_id='Lindex' @longpress='del_award' class='del_block'>
@@ -34,11 +38,12 @@
 								</view>
 								<view class="weui-cell__ft">
 
-									<view class="wux-xnumber  className ">
+									<!-- <view class="wux-xnumber  className ">
 										<view :id='aindex' :data-grade_id='Lindex' @click='bindtap' data-type="sub" class="wux-number-selector wux-number-selector-sub">-</view>
 										<input :id='aindex' :data-grade_id='Lindex' @input="num_input" :value="aitem.num" type="number" class="wux-number-input" />
 										<view :id='aindex' :data-grade_id='Lindex' @click="bindtap" data-type="add" class="wux-number-selector wux-number-selector-plus">+</view>
-									</view>
+									</view> -->
+									<uni-number-box @change="bindChange($event,aindex,Lindex)"></uni-number-box>
 								</view>
 							</view>
 						</view>
@@ -123,7 +128,9 @@
 </template>
 
 <script>
+	import uniNumberBox from "@/components/uni-number-box/uni-number-box.vue"
 	export default {
+		components: {uniNumberBox},
 		data() {
 			return {
 				focus: false,
@@ -131,6 +138,7 @@
 				id: '',
 				isShow: false,
 				leval_number: -1,
+				limit_number:-1,
 				lottery_function: ['随机按停抽奖', '摇一摇抽奖', '拼手速抽奖', '根据弹幕数量抽奖'],
 				lottery_leval: ['特等奖', '一等奖', '二等奖', '三等奖', '参与奖', '幸运奖'],
 				lottery_list: [{
@@ -158,8 +166,9 @@
 					grade: '特等奖',
 					awards: [{
 						award: '',
-						num: 0
-					}]
+						num: 1
+					}],
+					limit:1
 				}]
 			};
 		},
@@ -174,7 +183,18 @@
 				//更新投票列表
 
 			},
-
+			// 人数改变
+			limit_change(e,Lindex){
+				this.lottery[Lindex].limit = e
+			},
+			bindChange(e,aindex,Lindex){
+				console.log(e,aindex,Lindex);
+				let award_index = aindex//获取选项在当前问题列表中的下标
+				let grade_index = Lindex //获取问题在当前投票列表中
+				let lotterys = this.lottery //获取当前页面的投票列表
+				lotterys[grade_index].awards[award_index].num = e
+				console.log(this.lottery);
+			},
 			bindtap(event) {
 				const type = event.currentTarget.dataset.type
 				let award_index = event.currentTarget.id //获取选项在当前问题列表中的下标

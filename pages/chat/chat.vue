@@ -1,40 +1,62 @@
 <template>
 	<view class="my_chat">
-		<scroll-view class="cu-chat" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :style="{'height':screen_height}">
-	<!-- 	<view class="cu-chat"> -->
-			<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}" :id="index">
-				<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
-				<view class="main">
-					<view class="content bg-green shadow">
-						<text>{{item.msg}}</text>
+		<view class="danmu" v-if="type == 'danmu'">
+			<scroll-view class="cu-chat" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :style="{'height':screen_height}">
+				<!-- 	<view class="cu-chat"> -->
+				<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}" :id="index"
+				 @click="showmodel(item.uid)">
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
+					<view class="main">
+						<view class="content bg-green shadow">
+							<text>{{item.msg}}</text>
+						</view>
 					</view>
+					<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
 				</view>
-				<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
-				<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
-			</view>
-			<!-- <view class="cu-item">
-				<view class="cu-avatar radius" style="background-image:url(https://ossweb-img.qq.com/images/lol/web201310/skin/big143004.jpg);"></view>
-				<view class="main">
-					<view class="content shadow">
-						<text>喵喵喵！喵喵喵！</text>
-					</view>
-				</view>
-			</view> -->
-		<!-- </view> -->
-		</scroll-view>
+			</scroll-view>
 
-		<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
-			<view class="action">
-				<text class="cuIcon-sound text-grey"></text>
+			<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
+				<view class="action">
+					<text class="cuIcon-sound text-grey"></text>
+				</view>
+				<input class="solid-bottom" v-model="value" :adjust-position="false" :focus="false" maxlength="300" cursor-spacing="10"
+				 @focus="InputFocus" @blur="InputBlur"></input>
+				<view class="action">
+					<text class="cuIcon-emojifill text-grey"></text>
+				</view>
+				<button class="cu-btn bg-green shadow" @click="clickRequest">发送</button>
 			</view>
-			<input class="solid-bottom" v-model="value" :adjust-position="false" :focus="false" maxlength="300" cursor-spacing="10"
-			 @focus="InputFocus" @blur="InputBlur"></input>
-			<view class="action">
-				<text class="cuIcon-emojifill text-grey"></text>
-			</view>
-			<button class="cu-btn bg-green shadow" @click="clickRequest">发送</button>
+
 		</view>
+		<view class="one" v-if="type == 'one'">
+			<scroll-view class="cu-chat" scroll-y="true" :scroll-with-animation="scrollAnimation" :scroll-top="scrollTop" :style="{'height':screen_height}">
+				<!-- 	<view class="cu-chat"> -->
+				<view class="cu-item" v-for="(item,index) in barrage" :key=index :class="{'self':item.type=='me'}" :id="index">
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'otherbarrage'"></view>
+					<view class="main">
+						<view class="content bg-green shadow">
+							<text>{{item.msg}}</text>
+						</view>
+					</view>
+					<!-- 绑定样式用对象 "{backgroundImage:'url('+item.face+')'}"-->
+					<view class="cu-avatar radius" :style="{backgroundImage:`url(${item.face})`}" v-if="item.type == 'me'"></view>
+				</view>
+			</scroll-view>
 
+			<view class="cu-bar foot input" :style="[{bottom:InputBottom+'px'}]">
+				<view class="action">
+					<text class="cuIcon-sound text-grey"></text>
+				</view>
+				<input class="solid-bottom" v-model="value" :adjust-position="false" :focus="false" maxlength="300" cursor-spacing="10"
+				 @focus="InputFocus" @blur="InputBlur"></input>
+				<view class="action">
+					<text class="cuIcon-emojifill text-grey"></text>
+				</view>
+				<button class="cu-btn bg-green shadow" @click="one">发送</button>
+			</view>
+
+		</view>
 	</view>
 </template>
 
@@ -43,18 +65,38 @@
 	export default {
 		onLoad(option) {
 			this.m_id = option.m_id;
+			this.type = option.type
 			_self = this;
 			uni.getSystemInfo({
 				success(res) {
-					_self.screen_height = (res.windowHeight - 55)+'px'
-
+					_self.screen_height = (res.windowHeight - 55) + 'px'
 				}
 			})
 			// 进入这个页面的时候创建websocket连接【整个页面随时使用】
-			this.connectSocketInit();
+			if (this.type == 'danmu') {
+				this.connectSocketInit();
+			} else {
+				console.log(option);
+				let f = JSON.parse(option.friend)
+				let f_message = JSON.parse(option.f_message)
+				this.barrage = this.barrage.concat(f_message)
+				this.onetoone = f
+				console.log(this.onetoone);
+				uni.setNavigationBarTitle({
+					title: f.username + '(' + f.status?'在线':'离线' + ')'
+				})
+				this.$Socket.eventPatch.onMsg((msg,sk)=> {
+					let msgdata = JSON.parse(msg.data)
+					if(msgdata.flag == 'onetoone'){
+						this.barrage = this.barrage.concat(msgdata)
+					}
+				})
+				console.log(this.barrage);
+			}
 		},
 		data() {
 			return {
+				onetoone:{}, //一对一时用户信息
 				scrollAnimation: false,
 				scrollTop: 0,
 				// 屏幕高度
@@ -66,12 +108,13 @@
 				u_id: uni.getStorageSync('SUID'),
 				face: uni.getStorageSync('SFACE'),
 				name: uni.getStorageSync('SNAME'),
-				value: '',
+				value: '', // 输入框
 				socketTask: null,
 				// 确保websocket是打开状态
 				is_open_socket: false,
 				barrage: [],
 				// mybarrage:[]
+				type: ''
 			}
 		},
 		// 关闭websocket【必须在实例销毁之前关闭,否则会是underfined错误】
@@ -83,6 +126,47 @@
 
 		},
 		methods: {
+			// 单独聊天发送
+			one() {
+				console.log(this.onetoone.u_id);
+				let send_data = {
+					flag:'onetoone',
+					fid:this.onetoone.u_id, // 要发送到的用户
+					// 标志是否我发的
+					type: 'me',
+					msg: this.value,
+					face: this.face,
+					naem: this.name,
+					uid: this.u_id
+				};
+				if(this.onetoone.status){
+					if (this.value.trim()) {
+						_self.$Socket.nsend(JSON.stringify(send_data))
+					}
+				}
+			},
+			// 打开模态框加好友
+			showmodel(fid) {
+				uni.showActionSheet({
+					itemList: ['添加好友'],
+					success() {
+						this.$http.post('userapi/v1/friend/', {
+							params: {
+								uid: this.u_id,
+								fid: fid,
+								type: 'add'
+							}
+						}).then(res => {
+							console.log(res);
+							if (res.data.msg == 'ok') {
+								uni.showToast({
+									title: '发送成功'
+								})
+							}
+						}).catch()
+					}
+				})
+			},
 			// 输入框聚焦
 			InputFocus(e) {
 				this.InputBottom = e.detail.height
@@ -147,6 +231,7 @@
 					}
 				})
 			},
+			// 弹幕发送
 			clickRequest() {
 				console.log(this.value);
 				if (this.value.trim()) {
@@ -161,7 +246,8 @@
 							type: 'me',
 							msg: this.value,
 							face: this.face,
-							naem: this.name
+							naem: this.name,
+							uid: this.u_id
 						};
 						this.value = '';
 						console.log('在发送前以清空');
@@ -200,9 +286,9 @@
 				let that = this;
 				let query = uni.createSelectorQuery();
 				query.select('.cu-chat').fields({
-					size:true,
-					scrollOffset:true
-				},data=>{
+					size: true,
+					scrollOffset: true
+				}, data => {
 					console.log(data);
 					that.scrollTop = data.scrollHeight
 					console.log(data.scrollTop);
@@ -212,10 +298,10 @@
 
 		},
 		// 监听事件
-		watch:{
+		watch: {
 			// 监听指点滚动变化 可有两个参数,第一个为新值,第二个为旧值
-			barrage(value){
-				this.$nextTick(function(){
+			barrage(value) {
+				this.$nextTick(function() {
 					this.scrollToBottom()
 				})
 			}

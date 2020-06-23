@@ -6,10 +6,10 @@
 					<cmd-avatar :src="userInfo.image" @tap.stop="previewimg(userInfo.image)"></cmd-avatar>
 				</cmd-cel-item>
 				<cmd-cel-item title="昵称" :addon="userInfo.username" arrow @click='change_name("0")'></cmd-cel-item>
-				<cmd-cel-item title="个性签名" :addon="userInfo.sign" arrow></cmd-cel-item>
-				<cmd-cel-item title="性别" :addon="userInfo.sex" arrow></cmd-cel-item>
-				<cmd-cel-item title="地区" :addon="userInfo.label1" arrow></cmd-cel-item>
-				<cmd-cel-item title="二维码名片" arrow></cmd-cel-item>
+				<cmd-cel-item title="个性签名" :addon="userInfo.sign" arrow @click='change_sign("1")'></cmd-cel-item>
+				<cmd-cel-item title="性别" :addon="userInfo.sex" arrow @click='change_sex("2")'></cmd-cel-item>
+				<cmd-cel-item title="Email" :addon="userInfo.email" arrow></cmd-cel-item>
+				<cmd-cel-item title="二维码名片" arrow @click='toMycode'></cmd-cel-item>
 				<cmd-cel-item title="联系方式" :addon="userInfo.label2" arrow></cmd-cel-item>
 				<cmd-cel-item title="我的地址" :addon="userInfo.address" arrow></cmd-cel-item>
 				<button class="btn-logout" @click="back_login">退出登录</button>
@@ -44,7 +44,7 @@
 				// 用户id
 				uid: uni.getStorageSync('SUID'),
 				// 要修改处id
-				c_id:'',
+				c_id: '',
 				// 控制弹框输入框显示
 				promptVisible: false,
 				// 弹出标题
@@ -72,11 +72,46 @@
 		},
 
 		methods: {
+			// 前往我的二维码页面
+			toMycode(){
+				uni.navigateTo({
+					url:'../qr_code/qr_code?type=personage&uid='+this.uid +'&name='+JSON.stringify({name:this.userInfo.username,avator:this.userInfo.image}) 
+				})
+			},
 			//点击弹出输入框确定
 			clickPromptConfirm(val) {
 				this.promptVisible = false
-				if(this.c_id == '0'){
-					this.userInfo.username = val
+				if (this.c_id == '0') {
+
+					_self.$http.post(_self.baseurl + 'userapi/v1/usermessage/', {
+						type: 'name',
+						newname: val,
+						uid: _self.uid
+					}).then(res => {
+						let data = res.data
+						if (data.msg == 'ok') {
+							_self.userInfo.username = val
+							uni.showToast({
+								
+								title: '昵称修改成功'
+							})
+						}
+					}).catch();
+				} else if (this.c_id == '1') {
+
+					_self.$http.post(_self.baseurl + 'userapi/v1/usermessage/', {
+						type: 'sign',
+						newsign: val,
+						uid: _self.uid
+					}).then(res => {
+						let data = res.data
+						if (data.msg == 'ok') {
+							_self.userInfo.sign = val
+							uni.showToast({
+								title: '签名修改成功'
+							})
+						}
+					}).catch();
 				}
 				console.log(this.userInfo);
 			},
@@ -129,6 +164,13 @@
 				this.c_id = c_id
 				this.title = '请输入新昵称'
 				this.placeholder = '请输入新昵称'
+				this.promptVisible = true
+			},
+			// 修改签名
+			change_sign(c_id) {
+				this.c_id = c_id
+				this.title = '请输入新签名'
+				this.placeholder = '请输入新签名'
 				this.promptVisible = true
 			}
 		}

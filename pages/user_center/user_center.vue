@@ -55,9 +55,6 @@
 						path: '../create_meeting/create_meeting'
 					},
 					{
-						name: '我的二维码',
-						path: '../create_meeting/create_meeting'
-					},{
 						name: '我的收藏',
 						path: '../create_meeting/create_meeting'
 					}, {
@@ -69,16 +66,17 @@
 					},
 					{
 						name: '我的奖品',
-						path: '../create_meeting/create_meeting'
+						path: '../my_award/my_award'
 					},
 					{
 						name: '反馈与建议',
-						path: '../create_meeting/create_meeting'
+						path: '../feedback/feedback'
 					}
 				]
 			}
 		},
 		methods: {
+			// 扫码签到
 			scanf() {
 				uni.scanCode({
 					success(res) {

@@ -108,14 +108,14 @@
 						_self.$http.post('meetingapi/v1/sign/', {
 							u_id: uni.getStorageSync('SUID'),
 							m_id: res.result
-						}).then(res => {
-							console.log(res);
-							if (res.data.data == 'success') {
-								that.$Socket.nsend(JSON.stringify({type:'sign',avator:that.avator}))
+						}).then(resp => {
+							console.log(resp);
+							if (resp.data.data == 'success') {
+								_self.$Socket.nsend(JSON.stringify({type:'sign',avator:_self.avator,mid:res.result}))
 								uni.showToast({
 									title: "签到成功"
 								});
-							} else if (res.data.data == 'completed') {
+							} else if (resp.data.data == 'completed') {
 								uni.showToast({
 									title: '请勿重复签到'
 								})
@@ -124,7 +124,7 @@
 									title: '你没参加该会议'
 								})
 							}
-						}).catch(res => {
+						}).catch(resp => {
 
 						})
 

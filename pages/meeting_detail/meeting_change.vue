@@ -17,7 +17,7 @@
 					<view class="content">
 						<text class="cuIcon-circlefill text-grey"></text>
 						<text class="text-grey">会议时间:</text>
-						<text class="text-grey">{{m_obj.b_time}}</text>
+						<text class="text-grey">{{m_obj.e_time}} {{m_obj.b_time}}</text>
 					</view>
 				</view>
 				<view class="cu-item">
@@ -31,7 +31,7 @@
 					<view class="content">
 						<text class="cuIcon-circlefill text-grey"></text>
 						<text class="text-grey">会议状态:</text>
-						<text class="text-grey">{{m_obj.status}}</text>
+						<text class="text-grey">{{m_obj.status?'开始':'未开始'}}</text>
 					</view>
 				</view>
 				<view class="cu-item" :class="menuArrow?'arrow':''">
@@ -39,9 +39,11 @@
 						<text class="cuIcon-tagfill text-red  margin-right-xs"></text>
 						<text class="text-grey">标签</text>
 					</view>
-					<view class="action">
-						<view class="cu-tag round bg-orange light">{{m_obj.mlabel}}</view>
-
+					<view class="action"  v-for="(label,index) in m_obj.mlabel" :key='index'>
+						<view class="cu-tag round bg-orange light">
+							{{label.name}}
+						</view>
+						
 					</view>
 				</view>
 			</view>
@@ -73,6 +75,7 @@
 
 				if (res.data.msg == 'ok') {
 					this.m_obj = res.data.data
+					this.m_obj.mlabel = JSON.parse(this.m_obj.mlabel)
 					console.log(this.m_obj);
 				}
 			}).catch(err => {

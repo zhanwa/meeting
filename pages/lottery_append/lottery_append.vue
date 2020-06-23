@@ -29,10 +29,20 @@
 	export default {
 		data() {
 			return {
-
+				m_id:'',
+				role:''
 			};
 		},
+		onLoad(option) {
+			this.m_id = option.m_id
+			this.role = option.role
+		},
 		methods:{
+			danmu_lottery(){
+				uni.navigateTo({
+					url: '../chat/chat?m_id=' + this.m_id + '&role=' + this.role+'&type=danmu'
+				})
+			},
 			shake_lottery(){
 				uni.navigateTo({
 					url:'./shark_lottery'
